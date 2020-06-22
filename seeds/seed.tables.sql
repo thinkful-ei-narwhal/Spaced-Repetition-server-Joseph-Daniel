@@ -11,8 +11,7 @@ VALUES
     1,
     'admin',
     'Database Admin',
-    -- password = "pass"
-    '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG'
+    '$2a$04$XCpvigafYoGbY5ZZkzaOYejXdH2qkWEwrMj/97ijyffYee98KZIJ6'
   );
 
 INSERT INTO "language" ("id", "name", "user_id")
