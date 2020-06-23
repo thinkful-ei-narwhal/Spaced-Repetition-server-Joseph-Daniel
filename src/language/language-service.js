@@ -7,10 +7,10 @@ const LanguageService = {
         'language.name',
         'language.user_id',
         'language.head',
-        'language.total_score',
+        'language.total_score'
       )
       .where('language.user_id', user_id)
-      .first()
+      .first();
   },
 
   getLanguageWords(db, language_id) {
@@ -24,10 +24,26 @@ const LanguageService = {
         'next',
         'memory_value',
         'correct_count',
-        'incorrect_count',
+        'incorrect_count'
       )
-      .where({ language_id })
+      .where({ language_id });
   },
-}
 
-module.exports = LanguageService
+  getLanguageHead(db, language_id) {
+    return db
+      .from('word')
+      .rightJoin('language', 'language.id', '=', 'word.language_id')
+      .column({
+        nextWord: 'original',
+        totalScore: 'total_score',
+        wordCorrectCount: 'correct_count',
+        wordIncorrectCount: 'incorrect_count',
+      })
+      .select()
+      .where('language_id', language_id)
+      .first();
+    
+  }
+};
+
+module.exports = LanguageService;
