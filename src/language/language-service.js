@@ -77,22 +77,6 @@ const LanguageService = {
     return sll;
   },
 
-  // persistLinkedList(db, sll, score) {
-  //   return db.transaction(function(trx) {
-  //     return trx('language')
-  //       .update({ total_score: score }).where('language.id', '=', `${sll.langauge_id}`)
-  //       .then(function() {
-  //         for (const node of sll) {
-  //           return trx('word').where('word.id', '=', `${node.value.id}`).update({
-  //             memory_value: node.value.memory_value,
-  //             correct_count: node.value.correct_count,
-  //             incorrect_count: node.value.incorrect_count,
-  //             next: node.value.next
-  //           });}
-  //       });
-  //   });
-  // },
-
   persistLinkedList(db, sll, score) {
     return db.transaction(function(trx) {
       return Promise.all([
