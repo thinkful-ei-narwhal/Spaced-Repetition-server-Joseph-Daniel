@@ -73,7 +73,7 @@ class LinkedList {
   }
 
   insertAt(item, position){
-    if (position === 0) {
+    if (position <= 0) {
       this.insertFirst(item);
     }
 
@@ -157,7 +157,7 @@ class LinkedList {
   moveHeadBy(level) {
     let head = this.head;
     this.head = this.head.next;
-    this.insertAt(level, head.value);
+    this.insertAt(head.value, level);
   }
 
   *[Symbol.iterator]() {
@@ -165,6 +165,17 @@ class LinkedList {
     while(node) {
       yield node;
       node = node.next;
+    }
+  }
+
+  forEach(fn) {
+    let node = this.head;
+    let counter = 0;
+
+    while(node) {
+      fn(node, counter);
+      node = node.next;
+      counter++;
     }
   }
 }

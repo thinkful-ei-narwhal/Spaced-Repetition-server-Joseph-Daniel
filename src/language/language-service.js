@@ -75,7 +75,42 @@ const LanguageService = {
     }
 
     return sll;
+  },
+
+  persistLinkedList(db, sll, score) {
+    return db.transaction(function(trx) {
+      return trx('language')
+        .update({ totalScore: score })
+        .then(function() {
+          sll.forEach(item => {
+            trx('word').where('word.id', '=', `${item.value.id}`).update(item);
+          })
+        })
+    })
   }
 };
 
 module.exports = LanguageService;
+
+// knex.transaction(function(trx) {
+
+//   const books = [
+//     {title: 'Canterbury Tales'},
+//     {title: 'Moby Dick'},
+//     {title: 'Hamlet'}
+//   ];
+
+//   return trx
+//     .insert({name: 'Old Books'}, 'id')
+//     .into('catalogues')
+//     .then(function(ids) {
+//       books.forEach((book) => book.catalogue_id = ids[0]);
+//       return trx('books').insert(books);
+//     });
+// })
+// .then(function(inserts) {
+//   console.log(inserts.length + ' new books saved.');
+// })
+// .catch(function(error) {
+//   console.error(error);
+// });

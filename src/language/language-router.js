@@ -77,7 +77,8 @@ languageRouter
         req.language.id,
       )
 
-      const sll = LanguageService.createList(req.langauge, words)
+      
+      const sll = LanguageService.createList(req.language, words)
 
       const node = sll.head;
 
@@ -86,19 +87,23 @@ languageRouter
       let isCorrect = (req.body.guess === answer)
 
       if (isCorrect) {
-        // do thing to sll
+        sll.head.value.memory_value *= 2;
+        sll.head.value.correct_count += 1;
+        req.language.total_score += 1;
       } else {
-        // do other thing to sll
+        sll.head.value.memory_value = 1;
+        sll.head.value.incorrect_count += 1;
       }
-
-      // eventually call something like LanguageService.persistLinkedList(req.app.get('db), ll)
-
+      
+      sll.moveHeadBy(sll.head.value.memory_value)
+      LanguageService.persistLinkedList(req.app.get('db'), sll, req.language.total_score)
+      // eventually call something like LanguageService.persistLinkedList(req.app.get('db), sll, score)
 
       res.json({
-        nextWord: ll.head.value.original,
-        wordCorrectCount: ll.head.value.correct_count,
-        wordIncorrectCount: ll.head.value.incorrect_count,
-        totalScore: ll.total_score,
+        nextWord: sll.head.value.original,
+        wordCorrectCount: sll.head.value.correct_count,
+        wordIncorrectCount: sll.head.value.incorrect_count,
+        totalScore: sll.total_score,
         answer,
         isCorrect,
       })
