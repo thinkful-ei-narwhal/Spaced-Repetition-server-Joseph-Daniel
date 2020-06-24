@@ -1,3 +1,5 @@
+const SLL = require('../SLL/SLL');
+
 const LanguageService = {
   getUsersLanguage(db, user_id) {
     return db
@@ -43,6 +45,36 @@ const LanguageService = {
       .where('language_id', language_id)
       .first();
     
+  },
+
+  createList(language, words) {
+    const sll = new SLL();
+    sll.id = language.id;
+    sll.name = language.name;
+    sll.total_score = language.total_score;
+
+    let word = words.find(w => w.id === language.head)
+    
+    sll.insertFirst({
+      id: word.id, 
+      original: word.original, 
+      translation: word.translation, 
+      memory_value: word.memory_value, 
+      correct_count: word.correct_count, 
+      incorrect_count: word.incorrect_count})
+
+    while(word.next) {
+      word = words.find(w => w.id === word.next)
+      sll.insertLast({
+        id: word.id, 
+        original: word.original, 
+        translation: word.translation, 
+        memory_value: word.memory_value, 
+        correct_count: word.correct_count, 
+        incorrect_count: word.incorrect_count})  
+    }
+
+    return sll;
   }
 };
 
