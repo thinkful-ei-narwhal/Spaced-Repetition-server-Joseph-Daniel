@@ -77,10 +77,10 @@ const LanguageService = {
     return sll;
   },
 
-  persistLinkedList(db, sll, score) {
+  persistLinkedList(db, sll) {
     return db.transaction(function(trx) {
       return Promise.all([
-        db('language').transacting(trx).where('id', sll.language_id).update({total_score: score, head: sll.head.value.id}),
+        db('language').transacting(trx).where('id', sll.language_id).update({total_score: sll.total_score, head: sll.head.value.id}),
         ...sll.map(node => db('word').transacting(trx).where('id', node.value.id).update({
           memory_value: node.value.memory_value,
           correct_count: node.value.correct_count,

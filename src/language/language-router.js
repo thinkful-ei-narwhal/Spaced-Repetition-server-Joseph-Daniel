@@ -47,15 +47,12 @@ languageRouter
 languageRouter
   .get('/head', async (req, res, next) => {
     try {
-      const headWord = await LanguageService.getLanguageHead(
+      const word = await LanguageService.getLanguageHead(
         req.app.get('db'),
         req.language.id
       )
 
-      res.json(
-        headWord
-      )
-      next()
+      res.json(word)
     } catch (error) {
       next(error)
     }
@@ -89,7 +86,7 @@ languageRouter
 
       if (isCorrect) {
         
-        sll.head.value.memory_value * 2 > sll.size() ? sll.head.value.memory_value = sll.size() : sll.head.value.memory_value *= 2;
+        sll.head.value.memory_value * 2 >= sll.size() ? sll.head.value.memory_value = sll.size() - 1 : sll.head.value.memory_value *= 2;
         sll.head.value.correct_count += 1;
         sll.total_score += 1;
       } else {
@@ -98,7 +95,7 @@ languageRouter
       }
       
       sll.moveHeadBy(sll.head.value.memory_value)
-      LanguageService.persistLinkedList(req.app.get('db'), sll, sll.total_score)
+      await LanguageService.persistLinkedList(req.app.get('db'), sll)
         .catch(error => console.log(error));
 
       res.json({
@@ -109,7 +106,6 @@ languageRouter
         answer,
         isCorrect,
       })
-      next()
     } catch (error) {
       next(error)
     }
