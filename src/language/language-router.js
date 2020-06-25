@@ -47,15 +47,12 @@ languageRouter
 languageRouter
   .get('/head', async (req, res, next) => {
     try {
-      const headWord = await LanguageService.getLanguageHead(
+      const word = await LanguageService.getLanguageHead(
         req.app.get('db'),
         req.language.id
       )
 
-      res.json(
-        headWord
-      )
-      next()
+      res.json(word)
     } catch (error) {
       next(error)
     }
@@ -65,11 +62,10 @@ languageRouter
 languageRouter
   .post('/guess', jsonParser, async (req, res, next) => {
     try {
-
-      for (const [key, value] of Object.entries(req.body.guess))
+      for (const [key, value] of Object.entries(req.body))
       // eslint-disable-next-line eqeqeq
-      if (value == null) {
-        return res.status(400).json({error: `Missing '${key}' in request body`});
+      if (value == null || key !== 'guess') {
+        return res.status(400).json({error: `Missing 'guess' in request body`});
       }
 
       const words = await LanguageService.getLanguageWords(
@@ -87,18 +83,21 @@ languageRouter
 
       let isCorrect = (req.body.guess === answer)
 
+      console.log(`${isCorrect}, ${answer}`)
+
       if (isCorrect) {
-        sll.head.value.memory_value *= 2;
+        
+        sll.head.value.memory_value * 2 >= sll.size() ? sll.head.value.memory_value = sll.size() - 1 : sll.head.value.memory_value *= 2;
         sll.head.value.correct_count += 1;
-        req.language.total_score += 1;
+        sll.total_score += 1;
       } else {
         sll.head.value.memory_value = 1;
         sll.head.value.incorrect_count += 1;
       }
       
       sll.moveHeadBy(sll.head.value.memory_value)
-      LanguageService.persistLinkedList(req.app.get('db'), sll, req.language.total_score)
-      // eventually call something like LanguageService.persistLinkedList(req.app.get('db), sll, score)
+      await LanguageService.persistLinkedList(req.app.get('db'), sll)
+        .catch(error => console.log(error));
 
       res.json({
         nextWord: sll.head.value.original,
@@ -108,7 +107,6 @@ languageRouter
         answer,
         isCorrect,
       })
-      next()
     } catch (error) {
       next(error)
     }

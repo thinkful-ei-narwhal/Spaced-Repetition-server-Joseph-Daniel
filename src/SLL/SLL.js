@@ -72,19 +72,27 @@ class LinkedList {
     current.next = new _Node(item, after);
   }
 
-  insertAt(item, position){
-    if (position <= 0) {
-      this.insertFirst(item);
+  insertAt(nthPosition, itemToInsert) {
+    if (nthPosition < 0) {
+      throw new Error('Position error');
     }
-
-    let counter = 1;
-    let current = this.head;
-    while (counter < position){
-      current = current.next;
-      counter ++;
+    if (nthPosition === 0) {
+      this.insertFirst(itemToInsert);
+    }else {
+      // Find the node which we want to insert after
+      const node = this._findNthElement(nthPosition - 1);
+      const newNode = new _Node(itemToInsert, null);
+      newNode.next = node.next;
+      node.next = newNode;
     }
+  }
 
-    this.insertBefore(item, current);
+  _findNthElement(position) {
+    let node = this.head;
+    for (let i=0; i<position; i++) {
+      node = node.next;
+    }
+    return node;
   }
 
   remove(item){
@@ -157,7 +165,7 @@ class LinkedList {
   moveHeadBy(level) {
     let head = this.head;
     this.head = this.head.next;
-    this.insertAt(head.value, level);
+    this.insertAt(level, head.value);
   }
 
   *[Symbol.iterator]() {
@@ -177,6 +185,17 @@ class LinkedList {
       node = node.next;
       counter++;
     }
+  }
+
+  map(fn) {
+    let node = this.head;
+    let arr = [];
+
+    while(node){
+      arr.push(fn(node));
+      node = node.next;
+    }
+    return arr;
   }
 }
 

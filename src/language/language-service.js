@@ -49,11 +49,11 @@ const LanguageService = {
 
   createList(language, words) {
     const sll = new SLL();
-    sll.id = language.id;
+    sll.language_id = language.id;
     sll.name = language.name;
     sll.total_score = language.total_score;
 
-    let word = words.find(w => w.id === language.head)
+    let word = words.find(w => w.id === language.head);
     
     sll.insertFirst({
       id: word.id, 
@@ -61,57 +61,39 @@ const LanguageService = {
       translation: word.translation, 
       memory_value: word.memory_value, 
       correct_count: word.correct_count, 
-      incorrect_count: word.incorrect_count})
+      incorrect_count: word.incorrect_count});
 
     while(word.next) {
-      word = words.find(w => w.id === word.next)
+      word = words.find(w => w.id === word.next);
       sll.insertLast({
         id: word.id, 
         original: word.original, 
         translation: word.translation, 
         memory_value: word.memory_value, 
         correct_count: word.correct_count, 
-        incorrect_count: word.incorrect_count})  
+        incorrect_count: word.incorrect_count});  
     }
 
     return sll;
   },
 
-  persistLinkedList(db, sll, score) {
+  persistLinkedList(db, sll) {
     return db.transaction(function(trx) {
-      return trx('language')
-        .update({ totalScore: score })
-        .then(function() {
-          sll.forEach(item => {
-            trx('word').where('word.id', '=', `${item.value.id}`).update(item);
-          })
-        })
-    })
+      return Promise.all([
+        db('language').transacting(trx).where('id', sll.language_id).update({total_score: sll.total_score, head: sll.head.value.id}),
+        ...sll.map(node => db('word').transacting(trx).where('id', node.value.id).update({
+          memory_value: node.value.memory_value,
+          correct_count: node.value.correct_count,
+          incorrect_count: node.value.incorrect_count,
+          next: node.next ? node.next.value.id : null
+        }))
+      ]);
+      
+    });
   }
   
 };
 
+
+
 module.exports = LanguageService;
-
-// knex.transaction(function(trx) {
-
-//   const books = [
-//     {title: 'Canterbury Tales'},
-//     {title: 'Moby Dick'},
-//     {title: 'Hamlet'}
-//   ];
-
-//   return trx
-//     .insert({name: 'Old Books'}, 'id')
-//     .into('catalogues')
-//     .then(function(ids) {
-//       books.forEach((book) => book.catalogue_id = ids[0]);
-//       return trx('books').insert(books);
-//     });
-// })
-// .then(function(inserts) {
-//   console.log(inserts.length + ' new books saved.');
-// })
-// .catch(function(error) {
-//   console.error(error);
-// });
