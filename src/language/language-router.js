@@ -83,8 +83,6 @@ languageRouter
 
       let isCorrect = (req.body.guess === answer)
 
-      console.log(`${isCorrect}, ${answer}`)
-
       if (isCorrect) {
         
         sll.head.value.memory_value * 2 >= sll.size() ? sll.head.value.memory_value = sll.size() - 1 : sll.head.value.memory_value *= 2;
@@ -101,8 +99,8 @@ languageRouter
 
       res.json({
         nextWord: sll.head.value.original,
-        wordCorrectCount: sll.head.value.correct_count,
-        wordIncorrectCount: sll.head.value.incorrect_count,
+        wordCorrectCount: node.value.correct_count,
+        wordIncorrectCount: node.value.incorrect_count,
         totalScore: sll.total_score,
         answer,
         isCorrect,
