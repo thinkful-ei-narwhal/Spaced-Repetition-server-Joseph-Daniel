@@ -84,7 +84,6 @@ languageRouter
       let isCorrect = (req.body.guess === answer)
 
       if (isCorrect) {
-        
         sll.head.value.memory_value * 2 >= sll.size() ? sll.head.value.memory_value = sll.size() - 1 : sll.head.value.memory_value *= 2;
         sll.head.value.correct_count += 1;
         sll.total_score += 1;

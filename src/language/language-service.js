@@ -87,11 +87,9 @@ const LanguageService = {
           incorrect_count: node.value.incorrect_count,
           next: node.next ? node.next.value.id : null
         }))
-      ]);
-      
+      ]);    
     });
   }
-  
 };
 
 
